@@ -1,0 +1,124 @@
+{{- if .Values.adminEnable }}
+---
+apiVersion: storage.loft.sh/v1
+kind: User
+metadata:
+  name: {{ .Values.adminUsername }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    loft.sh/custom-data: {{ (printf "{'firstName':'%s','lastName':'person','organization':'loft'}" .Values.adminUsername) | b64enc }}
+spec:
+  access:
+  - subresources:
+    - accesskeys
+    - clusters
+    - profile
+    users:
+    - admin
+    verbs:
+    - get
+    - bind
+    - create
+    - deletekey
+    - getkey
+    - updatekey
+    - createkey
+  - name: loft-access
+    subresources:
+    - accesskeys
+    - clusters
+    - profile
+    users:
+    - admin
+    verbs:
+    - get
+    - bind
+    - create
+    - deletekey
+    - getkey
+    - updatekey
+    - createkey
+  displayName: {{ .Values.adminUsername | title }}
+  email: {{ default "admin@example.com" .Values.adminEmail }}
+  groups:
+  - loft:admins
+  passwordRef:
+    key: password
+    secretName: loft-user-secret-{{ .Values.adminUsername }}
+    secretNamespace: loft
+  subject: {{ .Values.adminUsername }}
+  username: {{ .Values.adminUsername }}
+
+{{ if .Values.adminPassword }}
+---
+apiVersion: v1
+data:
+  password: {{ default "password" .Values.adminPassword | sha256sum | b64enc }}
+kind: Secret
+metadata:
+  name: loft-user-secret-{{ .Values.adminUsername }}
+  namespace: loft
+type: Opaque
+{{ end }}
+{{- end }}
+
+{{ range .Values.users }}
+---
+apiVersion: storage.loft.sh/v1
+kind: User
+metadata:
+  name: {{ .name }}
+spec:
+  access:
+  - subresources:
+    - accesskeys
+    - clusters
+    - profile
+    users:
+    - admin
+    verbs:
+    - get
+    - bind
+    - create
+    - deletekey
+    - getkey
+    - updatekey
+    - createkey
+  - name: loft-access
+    subresources:
+    - accesskeys
+    - clusters
+    - profile
+    users:
+    - admin
+    verbs:
+    - get
+    - bind
+    - create
+    - deletekey
+    - getkey
+    - updatekey
+    - createkey
+  displayName: {{ .name | title }}
+  {{ if .email }}
+  email: {{ .email }}
+  {{ end }}
+  groups:
+  - loft:admins
+  passwordRef:
+    key: password
+    secretName: loft-user-secret-{{ .name }}
+    secretNamespace: loft
+  subject: {{ .name }}
+  username: {{ .name }}
+
+---
+apiVersion: v1
+data:
+  password: {{ default "password" .password | sha256sum }}
+kind: Secret
+metadata:
+  name: loft-user-secret-{{ .name }}
+  namespace: loft
+type: Opaque
+{{ end }}

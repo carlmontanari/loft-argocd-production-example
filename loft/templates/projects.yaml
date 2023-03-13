@@ -1,0 +1,35 @@
+{{ range .Values.projects }}
+---
+kind: Project
+apiVersion: management.loft.sh/v1
+metadata:
+  name: {{ .name }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  displayName: {{ .name }}
+  owner:
+    user: admin
+  quotas: {}
+  allowedClusters:
+    - name: '*'
+  allowedTemplates:
+    - kind: VirtualClusterTemplate
+      group: storage.loft.sh
+      name: '*'
+    - kind: SpaceTemplate
+      group: storage.loft.sh
+      name: '*'
+  members: []
+  access:
+    - name: loft-admin-access
+      verbs:
+        - get
+        - update
+        - patch
+        - delete
+      subresources:
+        - '*'
+      users:
+        - admin
+{{ end }}

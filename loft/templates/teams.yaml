@@ -1,0 +1,28 @@
+{{ range .Values.teams }}
+---
+apiVersion: management.loft.sh/v1
+kind: Team
+metadata:
+  name: {{ .name }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  displayName: {{ .name }}
+  owner:
+    user: admin
+  access:
+    - verbs:
+        - '*'
+      subresources:
+        - '*'
+      users:
+        - admin
+    - name: loft-access
+      verbs:
+        - get
+        - bind
+      subresources:
+        - clusters
+      teams:
+        - {{ .name }}
+{{ end }}

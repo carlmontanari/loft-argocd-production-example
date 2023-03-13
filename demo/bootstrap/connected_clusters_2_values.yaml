@@ -1,0 +1,5 @@
+---
+syncer:
+  extraArgs:
+    - --tls-san=cluster-2.cluster-2
+    - --out-kube-config-server=https://cluster-2.cluster-2

@@ -1,0 +1,67 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loft
+  namespace: argocd
+spec:
+  destination:
+    # cluster argo is running in
+    name: ''
+    namespace: loft
+    server: 'https://kubernetes.default.svc'
+  source:
+    # the repo in the loft dir
+    path: ./loft
+    repoURL: REPO_URL
+    targetRevision: HEAD
+    helm:
+      # for demo we set values explicitly here so we dont have to faff about with updating the values file
+      # and such
+      parameters:
+        - name: adminEnable
+          value: "true"
+        - name: adminUsername
+          value: "admin"
+        # setting this to empty string will cause us to use external secrets!
+        # we will make sure this is "admin"
+        - name: adminPassword
+          value: ""
+
+        - name: argoNamespace
+          value: "argocd"
+
+        # not providing a config means we'll expect the secret to exist already
+        - name: clusters[0].name
+          value: "cluster-1"
+        - name: clusters[0].clusterName
+          value: "cluster-1"
+        - name: clusters[0].namespace
+          value: "loft"
+        - name: clusters[0].agentValues
+          value: |-
+            - name: fullnameOverride
+              value: loft-agent
+
+        - name: clusters[1].name
+          value: "cluster-2"
+        - name: clusters[1].clusterName
+          value: "cluster-2"
+        - name: clusters[1].namespace
+          value: "loft"
+        - name: clusters[1].agentValues
+          value: |-
+            - name: fullnameOverride
+              value: loft-agent
+
+        - name: loft.config.loftHost
+          value: "https://INGRESS_HOST"
+
+
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

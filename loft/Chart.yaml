@@ -1,0 +1,12 @@
+apiVersion: v2
+name: loft-manager
+description: A parent Helm chart for Loft and Connected Clusters
+type: application
+version: 0.0.1
+dependencies:
+- name: loft
+  version: 3.0.0
+  repository: https://charts.loft.sh
+- name: loft-agent
+  version: 3.0.0
+  repository: https://charts.loft.sh

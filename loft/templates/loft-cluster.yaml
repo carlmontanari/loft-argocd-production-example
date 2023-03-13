@@ -1,0 +1,9 @@
+---
+apiVersion: storage.loft.sh/v1
+kind: Cluster
+metadata:
+  name: loft-cluster
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  local: true

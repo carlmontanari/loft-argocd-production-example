@@ -1,0 +1,27 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loft-agent-loft-cluster
+  namespace: argocd
+spec:
+  destination:
+    # cluster argo is running in, we'll assume the default k8s cluster, if you
+    # don't love that you can copypasta this yourself :D
+    namespace: REPLACE-ME-NAMESPACE
+    server: 'https://kubernetes.default.svc'
+  source:
+    # the repo in the loft dir
+    path: agent
+    repoURL: REPLACE-ME-REPO
+    targetRevision: HEAD
+    helm:
+      valueFiles:
+        - values.yaml
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

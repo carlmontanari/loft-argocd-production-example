@@ -1,0 +1,37 @@
+{{ range .Values.clusters }}
+---
+apiVersion: storage.loft.sh/v1
+kind: Cluster
+metadata:
+  name: {{ .name }}
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  access:
+  - subresources:
+    - '*'
+    users:
+    - admin
+    verbs:
+    - '*'
+  config:
+    secretName: loft-cluster-config-{{ .name }}
+    secretNamespace: loft
+  displayName: {{ .name }}
+  owner:
+    user: admin
+{{ end }}
+
+{{ range .Values.clusters }}
+{{ if .config }}
+---
+apiVersion: v1
+data:
+  config: {{ .config | b64enc }}
+kind: Secret
+metadata:
+  name: loft-cluster-config-{{ .name }}
+  namespace: loft
+type: Opaque
+{{ end }}
+{{ end }}

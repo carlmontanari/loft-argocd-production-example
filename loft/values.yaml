@@ -1,0 +1,82 @@
+# loft admin user, probably don't enable this for "real" without secrets management
+# such as helm secrets, external secrets or others!
+adminEnable: true
+adminUsername: admin
+adminEmail: admin@loft.sh
+# if admin password is an empty string (and adminEnable is true) we will assume
+# you are creating a secret named "loft-user-secret-{{ name }}" where name is the
+# adminUsername value. The secret should contain a field "password" that is a
+# sha256 sum (and b64 encoded) value that you want the password to be.
+adminPassword: password
+
+# namespace to deploy the child applications into
+argoNamespace: argocd
+
+# clusters to create, array of objects with the following fields:
+#   name: the name of the cluster from a Loft perspective
+#   config: valid kubeconfig for loft to reach the connected cluster, if this is left empty,
+#           we will assume you are using external secrets store (or some other mechanism) for
+#           deploying this secret. if manually configuring secret, the secret name must match
+#           "loft-cluster-config-{{ .name }}" where "name" is the name of the cluster provided
+#           here. below is an example config that can be provided here:
+#        apiVersion: v1
+#        clusters:
+#        - cluster:
+#            certificate-authority-data: SOMEB64STRING
+#            server: https://172.31.254.31:6443
+#          name: my-cluster
+#        contexts:
+#        - context:
+#            cluster: my-cluster
+#            namespace: kube-system
+#            user: my-cluster-admin
+#          name: my-cluster-context
+#        current-context: my-cluster-context
+#        kind: Config
+#        preferences: {}
+#        users:
+#        - name: my-cluster-admin
+#          user:
+#            token: SOMEB64STRING
+#   namespace: namespace to deploy the agent in in the connected cluster
+#   clusterName: the name of the cluster configured in argocd (where to point the application to basically)
+#   clusterServer: the url of the cluster configured in argocd (where to point the application to basically)
+#   project: name of the argocd project to put this application in
+#   chartVersion: version of the chart to use, defaults to the loft-agent version of the dependency of this chart
+#   agentValues: agent values to pass to the loft-agent chart in argocd format, ex:
+#         - name: somevaluename
+#           value: "true"
+clusters: []
+
+# users to create
+users: []
+
+# teams to create
+teams: []
+
+# projects to create
+projects: []
+
+# values that are passed to the loft dependency
+loft:
+  # disable creation of admin because we want to either manage users outside of this chart
+  # or we want to use the admin user vars at top of this values file which will create the
+  # user and have it be managed by argo rather than loft.
+  admin:
+    create: false
+
+  audit:
+    enableSideCar: true
+
+  config:
+    audit:
+      level: 1
+
+  env:
+    # disable agent so we can manage them with argo as well
+    DISABLE_AGENT: true
+
+# values that are passed to the loft-agent dependency (for the *main loft cluster*!)
+loft-agent:
+  # this is no longer necessary as of loft 3.0, leaving it in to show where to pass agent values!
+  fullnameOverride: loft-agent

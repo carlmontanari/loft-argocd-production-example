@@ -1,0 +1,36 @@
+{{ range .Values.clusters }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loft-agent-{{ .name }}
+  namespace: {{ $.Values.argoNamespace }}
+spec:
+  destination:
+    name: '{{ .clusterName }}'
+    namespace: {{ .namespace }}
+    server: '{{ .clusterServer }}'
+  source:
+    repoURL: https://charts.loft.sh
+    chart: loft-agent
+    {{- if .agentValues }}
+    helm:
+      parameters:
+{{ .agentValues | indent 8 }}
+    {{- end }}
+    {{- if .chartVersion }}
+    targetRevision: {{ .chartVersion }}
+    {{- else }}
+    {{- with (index $.Chart.Dependencies 1) }}
+    targetRevision: {{ .Version }}
+    {{- end }}
+    {{- end }}
+  project: {{ .project | default "default" }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+{{ end }}
