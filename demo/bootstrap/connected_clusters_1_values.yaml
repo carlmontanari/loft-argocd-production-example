@@ -1,4 +1,7 @@
 ---
+sync:
+  ingresses:
+    enabled: true
 syncer:
   extraArgs:
     - --tls-san=cluster-1.cluster-1
