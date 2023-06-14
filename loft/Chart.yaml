@@ -5,8 +5,8 @@ type: application
 version: 0.0.1
 dependencies:
 - name: loft
-  version: 3.1.1
+  version: 3.2.0
   repository: https://charts.loft.sh
 - name: loft-agent
-  version: 3.1.1
+  version: 3.2.0
   repository: https://charts.loft.sh

@@ -28,6 +28,7 @@ spec:
     - accesskeys
     - clusters
     - profile
+    - permissions
     users:
     - admin
     verbs:
