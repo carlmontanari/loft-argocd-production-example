@@ -3,6 +3,7 @@
 adminEnable: true
 adminUsername: admin
 adminEmail: admin@loft.sh
+# adminIcon: some url to a profile icon
 # if admin password is an empty string (and adminEnable is true) we will assume
 # you are creating a secret named "loft-user-secret-{{ name }}" where name is the
 # adminUsername value. The secret should contain a field "password" that is a

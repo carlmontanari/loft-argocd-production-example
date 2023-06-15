@@ -49,6 +49,9 @@ spec:
     secretNamespace: loft
   subject: {{ .Values.adminUsername }}
   username: {{ .Values.adminUsername }}
+  {{ if .Values.adminIcon }}
+  icon: {{ .Values.adminIcon }}
+  {{- end }}
 
 {{ if .Values.adminPassword }}
 ---
